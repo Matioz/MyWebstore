@@ -1,0 +1,145 @@
+﻿@model Repository.Models.Product
+@using Repository.Models;
+@{
+    ViewBag.Title = "Szczegóły";
+}
+<h2 class="text-center">@Model.Name</h2>
+<hr />
+
+<div>
+    <div class="row">
+        <div id="picture" class="col-lg-6">
+            @if (Model.Pictures.Count > 0)
+            {
+                <img src="~/Images/@Model.Pictures.First().Name" alt="Zdjecie" height="150" width="150" />
+            }
+            else
+            {
+                <img src="~/Images/no-photo.jpg" alt="Brak zdjec" height="150" width="150" />
+            }
+        </div>
+        <div id="description" class="col-lg-6">
+
+            @using (Html.BeginForm("Buy", "Store", FormMethod.Post))
+            {
+                @Html.HiddenFor(model => model.ProductId)
+                <div class="panel panel-title strip strip-title">Szczegóły</div>
+                <table class="panel table">
+                    <tr>
+                        <th class="col-lg-3">
+                            @Html.DisplayNameFor(model => model.Name)
+                        </th>
+                        <td class="col-lg-3">
+                            @Html.DisplayFor(model => model.Name)
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Producer.Name)
+                        </th>
+                        <td>
+                            <a title="Wszystkie produkty producenta" href="@Url.Action("Details", "Producers", new { id = Model.ProducerId})">@Model.Producer.Name</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Kategoria</th>
+                        <td>
+                            <a title="Wszystkie produkty z tej kategorii" href="@Url.Action("Index", new { category = @Model.CategoryId})">@Model.Category.Name</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Price)
+                        </th>
+
+                        <td>
+                            @Html.DisplayFor(model => model.Price)
+                            PLN
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Rozmiar
+                        </th>
+                        <td>
+                            <select name="size" class="dropdown dropdown-header list">
+                                @foreach (var size in Repository.Services.ProductService.DecodeSizes(Model.Sizes))
+                                {
+                                    <option class="item">@size</option>
+                                }
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>@Html.Label("color", "Kolor")</th>
+                        <td>
+                            <select name="color" id="color" class="dropdown dropdown-header">
+                                @foreach (var color in Repository.Services.ProductService.DecodeColors(Model.Colors))
+                                {
+                                    <option class="list-group-item list-group-item-text">@Repository.Services.ProductService.ColorDictionary[@color]</option>
+                                }
+
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.ActionLink("Powrót do listy", "Index", new { Controller = "Product" }, new { @class = "btn btn-warning" })
+                            @if (User.IsInRole("Admin"))
+                            {
+                                @Html.ActionLink("Edytuj", "Edit", new { id = Model.ProductId }, new { @class = "btn btn-default" })
+                            }
+                        </td>
+
+                        @if (Model.Amount > 0)
+                        {
+                            
+                            <td>
+                                <button type="submit" class="btn btn-success ">
+                                    Dodaj do koszyka
+                                </button>
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
+                                <span class="form-control  alert-danger text-center "> Produkt chwilowo niedostępny </span>
+                            </td>
+                        }
+                    </tr>
+
+                </table>
+
+            }
+        </div>
+    </div>
+    <hr />
+
+
+    @{
+        List<Product> otherProducts = Model.Category.Products.Where(p => p.ProductId != Model.ProductId).OrderBy(x => Guid.NewGuid()).Take(8).ToList();
+        <div class="panel panel-title strip strip-title">
+            Inne produkty z tej samej kategorii
+            <span class=" text-info pull-right">
+                <a title="Wszystkie produkty z tej kategorii" href="@Url.Action("Index", new { category = @Model.CategoryId})">
+                    Zobacz wszystkie
+                </a>
+            </span>
+        </div>
+        @Html.Partial("_productsStrip", otherProducts)
+
+        otherProducts = Model.Producer.Products.Where(p => p.ProductId != Model.ProductId).OrderBy(x => Guid.NewGuid()).Take(8).ToList();
+        <div class="panel panel-title strip strip-title">
+            Inne produkty tego samego producenta
+            <span class="text-info pull-right">
+                <a title="Wszystkie produkty producenta" href="@Url.Action("Details", "Producers", new { id = Model.ProducerId})">
+                    Zobacz wszystkie
+                </a>
+            </span>
+        </div>
+        @Html.Partial("_productsStrip", otherProducts)
+
+
+    }
+
+</div>

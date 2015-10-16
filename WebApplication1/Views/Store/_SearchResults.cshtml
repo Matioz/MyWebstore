@@ -1,0 +1,212 @@
+﻿@using PagedList.Mvc;
+@model PagedList.IPagedList<Repository.Models.Product>
+@using Repository.Services;
+<h5>
+    Jesteś tu: @Html.ActionLink("Wszystkie produkty", "Index")
+
+    @if (ViewBag.Category != null)
+    {
+        <span class="glyphicon glyphicon-arrow-right"></span>
+        @Html.ActionLink(Model.First().Category.Name.ToString(), "Index", new { category = ViewBag.Category });
+    }
+</h5>
+@if (User.IsInRole("Admin"))
+{
+    <p>
+        @Html.ActionLink("Dodaj nowy", "Create", new { Controller = "Product" }, new { @class = "btn btn-primary btn-sm active" })
+    </p>}
+<div>
+    <div class="panel panel-title strip strip-title">Wyniki wyszukiwania</div>
+    <table class="table table-striped table-hover panel panel-default">
+        <tr>
+            <th class="text-center">
+                @Html.ActionLink("Nazwa", "Index", new
+       {
+           sortOrder = ViewBag.ProductSort,
+           category = ViewBag.Category,
+           product = ViewBag.Product,
+           producer = ViewBag.Producer,
+           priceFrom = ViewBag.PriceFrom,
+           priceTo = ViewBag.PriceTo,
+           size = ViewBag.Size,
+           color = ViewBag.Color,
+           availableOnly = ViewBag.AvailableOnly
+       })
+            </th>
+            <th>
+                @Html.ActionLink("Producent", "Index", new
+       {
+           sortOrder = ViewBag.ProducerSort,
+           category = ViewBag.Category,
+           product = ViewBag.Product,
+           producer = ViewBag.Producer,
+           priceFrom = ViewBag.PriceFrom,
+           priceTo = ViewBag.PriceTo,
+           size = ViewBag.Size,
+           color = ViewBag.Color,
+           availableOnly = ViewBag.AvailableOnly
+       })
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].Sizes)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].Colors)
+            </th>
+            @if (User.IsInRole("Admin"))
+            {
+                <th>
+                    @Html.ActionLink("Ilość", "Index", new
+           {
+               sortOrder = ViewBag.AmountSort,
+               category = ViewBag.Category,
+               product = ViewBag.Product,
+               producer = ViewBag.Producer,
+               priceFrom = ViewBag.PriceFrom,
+               priceTo = ViewBag.PriceTo,
+               size = ViewBag.Size,
+               color = ViewBag.Color,
+               availableOnly = ViewBag.AvailableOnly
+           })
+                </th>
+            }
+            else
+            {
+                <th class="col-lg-1">Dostępność</th>
+            }
+            <th class="col-lg-1">
+                @Html.ActionLink("Cena", "Index", new
+       {
+           sortOrder = ViewBag.PriceSort,
+           category = ViewBag.Category,
+           product = ViewBag.Product,
+           producer = ViewBag.Producer,
+           priceFrom = ViewBag.PriceFrom,
+           priceTo = ViewBag.PriceTo,
+           size = ViewBag.Size,
+           color = ViewBag.Color,
+           availableOnly = ViewBag.AvailableOnly
+       })
+            </th>
+            @if (User.IsInRole("Admin"))
+            {
+                <th>Dodatkowe opcje</th>
+            }
+            else
+            {
+                <th></th>
+            }
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td style="vertical-align: middle">
+                    <a href="@Url.Action("Details", new{ id=item.ProductId})" class="btn-block">
+                        @if (item.Pictures.Count > 0)
+                        {
+                            <img src="@Url.Content("~/Images/"+item.Pictures.First().Name)" class="img-rounded" height="90" width="90" />
+                        }
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </a>
+                </td>
+                <td style="vertical-align: middle">
+                    @Html.ActionLink(item.Producer.Name, "Details", "Producers", new { id = item.ProducerId }, new { @class = "btn-block" })
+                </td>
+               
+                <td style="vertical-align: middle">
+                    @foreach (string size in ProductService.DecodeSizes(item.Sizes))
+                    {
+                        <span class="square">@size</span>
+                    }
+                </td>
+                <td style="vertical-align: middle">
+                    @foreach (string color in ProductService.DecodeColors(item.Colors))
+                    {
+                        <span class="square-xs" style="background-color: @color">&nbsp;</span>
+                    }
+                </td>
+                @if (User.IsInRole("Admin"))
+                {
+                    <td style="vertical-align: middle" class="text-right">
+                        @Html.DisplayFor(modelItem => item.Amount)
+                    </td>
+                }
+                else
+                {
+                    <td style="vertical-align: middle">
+
+                        @if (item.Amount > 0)
+                        {
+                            <span class="form-control alert-success text-center"> Dostępny </span>
+                        }
+                        else
+                        {
+
+                            <span class="form-control alert-danger text-center"> Niedostępny </span>
+                        }
+                    </td>
+                }
+<td style="vertical-align: middle">
+    @Html.DisplayFor(modelItem => item.Price) zł
+</td>
+                @if (User.IsInRole("Admin"))
+                {
+
+                    <td style="vertical-align: middle">
+                        @Html.ActionLink("Edytuj", "Edit", new { id = item.ProductId }, new { @class = "btn btn-warning" })
+                        @Html.ActionLink("Usuń", "Delete", new { id = item.ProductId }, new { @class = "btn btn-danger" })
+                    </td>
+                }
+                else if (item.Amount > 0)
+                {
+                    <td style="vertical-align: middle">
+                        @using (Html.BeginForm("Add", "ShoppingCart", FormMethod.Post, new { @class = "pull-right" }))
+                        {
+                            <input type="number" name="amount" min="1" value="1" max="99" style="max-width: 40px" />
+                            <button type="submit" class="btn-primary">
+                                <span class="glyphicon glyphicon-shopping-cart"></span>
+                            </button>
+                        }
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+            </tr>
+        }
+
+    </table>
+</div>
+
+<div>
+    <br />
+    Wyników @Model.TotalItemCount
+    <br />
+    Strona @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) z @Model.PageCount
+    @Html.PagedListPager(Model, page => Url.Action("Index", new
+{
+    page,
+    category = ViewBag.Category,
+    sortOrder = ViewBag.CurrentSort,
+    product = ViewBag.Product,
+    producer = ViewBag.Producer,
+    priceFrom = ViewBag.PriceFrom,
+    priceTo = ViewBag.PriceTo,
+    size = ViewBag.Size,
+    color = ViewBag.Color,
+    availableOnly = ViewBag.AvailableOnly
+}))
+</div>
+<input value="@(Url.RequestContext.HttpContext.Request.Url.GetLeftPart(UriPartial.Authority))@Url.Action("Index", "Store",  new
+                                    {
+                                        category = ViewBag.Category,
+                                        sortOrder = ViewBag.CurrentSort,
+                                        product = ViewBag.Product,
+                                        producer = ViewBag.Producer,
+                                        priceFrom = ViewBag.PriceFrom,
+                                        priceTo = ViewBag.PriceTo,
+                                        size = ViewBag.Size,
+                                        color = ViewBag.Color,
+                                        availableOnly = ViewBag.AvailableOnly
+                                    })" id="url" hidden />

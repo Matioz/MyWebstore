@@ -1,0 +1,37 @@
+﻿@model IDictionary<Repository.Models.Producer, int>
+<div class="form-group">
+    @{
+        int producers = ViewBag.Producer ?? 0;
+        int i = 0;
+        foreach (var item in Model)
+        {
+
+            <label for="@item.Key.ProducerId" class="control-label">
+                @Html.ActionLink(item.Key.Name + "(" + item.Value + ")", "index", new
+           {
+               category = ViewBag.Category,
+               sortOrder = ViewBag.CurrentSort,
+               product = ViewBag.Product,
+               producer = (1 << i),
+               priceFrom = ViewBag.PriceFrom,
+               priceTo = ViewBag.PriceTo,
+               size = ViewBag.Size,
+               color = ViewBag.Color,
+               availableOnly = ViewBag.AvailableOnly
+           })
+            </label>
+                if ((producers & (1 << i)) > 0)
+                {
+                <input type="checkbox" name="producer"  class="checkbox-inline pull-right" value="@(1<<i)" checked />}
+                else
+                {
+
+                    <input type="checkbox" name="producer"  id="@item.Key.ProducerId"  class="checkbox-inline pull-right" value="@(1<<i)" c />
+                }
+            <br />
+            i++;
+        }
+
+    }
+
+</div>

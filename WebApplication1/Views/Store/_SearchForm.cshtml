@@ -1,0 +1,110 @@
+﻿@using Repository.Services;
+@using (Ajax.BeginForm("Search", new { category = ViewBag.Category }, new AjaxOptions
+{
+    HttpMethod = "Get",
+    InsertionMode = InsertionMode.Replace,
+    UpdateTargetId = "search",
+    LoadingElementId = "ajax-loader",
+    OnComplete = "updateUrl",
+    OnBegin = "poczatek",
+    //Confirm = "Confirm",
+    
+}, new {  id = "ajaxForm"}))
+{
+    <h3>Wyszukaj</h3>
+    <div class="form-group">
+        @Html.Label("product", "Nazwa produktu", new { @class = "control-label" })
+        <input type="text" value="@ViewBag.Product" name="product" id="product" class="form-control" data-autocomplete-source="@Url.Action("QuickSearch", "Store", new { wanted = "products" })" />
+
+    </div>
+    <div class="form-group">
+                @Html.Label("producer", "Producent", new { @class = "control-label" })
+                @Html.Action("ProducersForm")
+    </div>
+    <div class="form-group">
+        @Html.Label("priceFrom", "Cena od", new { @class = "control-label" })
+        @Html.TextBox("priceFrom", (string)ViewBag.PriceFrom, new { @class = "form-control", type = "number", min = "0" })
+    </div>
+    <div class="form-group">
+        @Html.Label("priceTo", "Cena do", new { @class = "control-label" })
+        @Html.TextBox("priceTo", (string)ViewBag.PriceTo, new { @class = "form-control", type = "number", min = "0" })
+    </div>
+    <div class="form-group">
+        @Html.Label("availableOnly", "Tylko dostępne", new { @class = "control-label" })
+        @if (ViewBag.AvailableOnly != null && ViewBag.AvailableOnly == true)
+        {
+            @Html.CheckBox("availableOnly", true, new { @class = "pull-right" })
+        }
+        else
+        {
+            @Html.CheckBox("availableOnly", false, new { @class = "pull-right" })
+        }
+
+    </div>
+    <div class="form-group">
+        <label class="control-label btn-block" onclick="toggleSizes()">
+            Rozmiary
+            <span class="pull-right">
+                <span class="glyphicon glyphicon-menu-down" id="sizesDown" style="display: none"></span>
+                <span class="glyphicon glyphicon-menu-up" id="sizesUp" style="display: none"></span>
+            </span>
+        </label>
+        <div id="sizes">
+            @{
+        int sizeFilters = ViewBag.Size ?? 0;
+        for (int i = 0; i < ProductService.AvailableSizes.Length; i++)
+        {
+            string size = (string)ProductService.AvailableSizes.GetValue(i);
+            int value = (1 << i);
+            @Html.Label("size[" + i.ToString() + "]", size, new { @class = "control-label" })
+            if ((value & sizeFilters) > 0)
+            {
+                <input type="checkbox" name="size" id="size_@i.ToString()_" class="checkbox-inline pull-right" value="@value.ToString()" checked />}
+            else
+            {
+                <input type="checkbox" name="size" id="size_@i.ToString()_" class="checkbox-inline pull-right" value="@value.ToString()" />
+            }
+            <br />
+        }
+            }
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label btn-block" id="colorsLabel" onclick="toggleColors()">
+            Kolory
+            <span class="pull-right">
+                <span class="glyphicon glyphicon-menu-down" id="colorsDown" style="display: none"></span>
+                <span class="glyphicon glyphicon-menu-up" id="colorsUp" style="display: none"></span>
+            </span>
+        </label>
+        <div id="colors">
+            @{
+        int colorFilters = ViewBag.Color ?? 0;
+        var colorDictionary = ProductService.ColorDictionary;
+        for (int i = 0; i < ProductService.AvailableColors.Length; i++)
+        {
+            string color = (string)ProductService.AvailableColors.GetValue(i);
+            int value = (1 << i);
+            <label class="control-label" for="color_@i.ToString()_">
+                <span class="square-xs" style="background-color: @color"></span>
+                @colorDictionary[color]
+            </label>
+            if ((value & colorFilters) > 0)
+            {
+                <input type="checkbox" name="color" id="color_@i.ToString()_" class="checkbox-inline pull-right" value="@value.ToString()" checked />}
+            else
+            {
+                <input type="checkbox" name="color" id="color_@i.ToString()_" class="checkbox-inline pull-right" value="@value.ToString()" />
+            }
+            <br />
+        }
+            }
+        </div>
+    </div>
+    <button class="btn btn-default">
+        <span class="glyphicon glyphicon-search"></span>
+    </button>
+    @Html.ActionLink("Wyczyść filtry", "Index", null, new { @class = "btn btn-default" })
+
+}
+<br />

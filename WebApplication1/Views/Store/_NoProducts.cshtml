@@ -1,0 +1,15 @@
+﻿<h3 class="alert alert-warning">Nie ma produktów spełniających podane kryteria.</h3>
+
+
+<input value="@(Url.RequestContext.HttpContext.Request.Url.GetLeftPart(UriPartial.Authority))@Url.Action("Index", "Store",  new
+                                    {
+                                        category = ViewBag.Category,
+                                        sortOrder = ViewBag.CurrentSort,
+                                        product = ViewBag.Product,
+                                        producer = ViewBag.Producer,
+                                        priceFrom = ViewBag.PriceFrom,
+                                        priceTo = ViewBag.PriceTo,
+                                        size = ViewBag.Size,
+                                        color = ViewBag.Color,
+                                        availableOnly = ViewBag.AvailableOnly
+                                    })" id="url" hidden />

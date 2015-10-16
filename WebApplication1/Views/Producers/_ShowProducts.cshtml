@@ -1,0 +1,24 @@
+﻿@model IEnumerable<Repository.Models.Product>
+
+<h4>Produkty</h4>
+<hr />
+<div>
+    @foreach (var item in Model)
+    {
+        <div style="display:inline-block; width:120px; height: auto; margin:5px; padding:10px; border:dotted 1px black">
+            @if (item.Pictures.Count > 0)
+            {
+
+                <img src="@Url.Content("~/Images/"+item.Pictures.First().Name)" class="img-rounded" height="90" width="90" />
+            }
+            else
+            {
+
+                <img src="@Url.Content("~/Images/no-photo.jpg")" class="img-rounded" height="90" width="90" />
+            }
+            <br />
+            @Html.ActionLink(item.Name, "Details", new { Controller = "Product", Id = item.ProductId })
+        </div>
+    }
+</div>
+

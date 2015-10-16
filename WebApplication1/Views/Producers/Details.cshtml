@@ -1,0 +1,50 @@
+﻿@model Repository.Models.Producer
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Producent</h2>
+
+<div>
+    <h4>Szczegóły</h4>
+    <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.FirstName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.FirstName)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.LastName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.LastName)
+            </dd>
+
+        </dl>
+        @using Repository.Models;
+        @{
+            List<Product> Products = Model.Products.ToList();
+            Html.RenderPartial("_ShowProducts", Products);
+        }
+
+
+</div>
+<hr />
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ProducerId }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

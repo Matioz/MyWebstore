@@ -1,0 +1,15 @@
+﻿@model List<Repository.Models.Product>
+<div class="panel">
+    @foreach (var item in Model)
+    {
+        <div class="radio-inline text-center btn btn-link">
+            @if (item.Pictures.Count > 0)
+            {
+
+                <img src="@Url.Content("~/Images/"+item.Pictures.First().Name)" class="img-rounded" alt="zdjecie" height="100" width="100" />
+            }
+            <br />
+            @Html.ActionLink(item.Name, "Details", new { Controller = "Product", Id = item.ProductId })
+        </div>
+    }
+</div>

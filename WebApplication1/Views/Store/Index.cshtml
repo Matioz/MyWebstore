@@ -1,0 +1,12 @@
+﻿@{
+    ViewBag.Title = "Lista produktów";
+}
+
+<h2 class="text-center">Lista produktów</h2>
+<hr />
+<div id="search">    
+    @Html.Action("Search")
+</div>
+@section Scripts{
+    <script src="~/Scripts/Store/searchScripts.js"></script>
+}

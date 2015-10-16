@@ -1,0 +1,28 @@
+﻿@using PagedList.Mvc;
+@model PagedList.IPagedList<Repository.Models.Product>
+<div class="row">
+    <div id="searchForm" class="col-md-2 panel panel-default">
+                
+                @Html.Partial("_SearchForm", Model)
+    </div>
+    <div class="col-md-10">
+
+        @{
+            var generatingTime = new System.Diagnostics.Stopwatch();
+            generatingTime.Start();
+            <div class="text-center" id="ajax-loader" style="display: none">
+                <img src="~/Images/ajax-loader.gif" style="position: fixed" />
+            </div>
+            <section id="searchResults">
+                @Html.Action("SearchResults")
+            </section>
+            //@Html.Partial("_SearchResults", Model);
+            generatingTime.Stop();
+            <p>
+                Wygenerowano w @generatingTime.ElapsedMilliseconds ms
+            </p>
+        }
+
+    </div>
+</div>
+<script src="~/Scripts/Store/searchScripts.js"></script>
